@@ -1,0 +1,9 @@
+.gitignore
+.venv
+.pycache
+/data
+/outputs/models
+/External
+.idea
+*.iml
+*.xml
