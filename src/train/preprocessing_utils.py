@@ -150,7 +150,7 @@ def _review_text_lemmatization(
             [lemmatizer.lemmatize(word, wordnet_map.get(pos[0], wordnet.NOUN)) for word, pos in pos_tagged_text]
         )
 
-    df['lemmatized_review'] = df['tokenized_review'].parallel_apply(lemmatize_words)
+    df['legitimatized_review'] = df['tokenized_review'].parallel_apply(lemmatize_words)
     return df
 
 

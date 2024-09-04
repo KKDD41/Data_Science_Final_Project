@@ -3,3 +3,5 @@ numpy~=1.26.2
 nltk~=3.9.1
 spacy~=3.7.6
 pandarallel~=1.6.5
+scikit-learn~=1.5.1
+joblib~=1.4.2
