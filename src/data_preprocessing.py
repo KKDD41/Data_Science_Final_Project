@@ -4,6 +4,7 @@ import nltk
 import string
 from nltk.corpus import stopwords
 from pandarallel import pandarallel
+from sklearn.model_selection import train_test_split
 
 pandarallel.initialize(progress_bar=False)
 
@@ -159,3 +160,18 @@ def text_stemming(
 
     df['stemmed_review'] = df['tokenized_review'].parallel_apply(stem_words)
     return df
+
+
+def vectorize_review(
+        df: pd.DataFrame,
+        processed_text_col_name: str,
+        train_df_len: int,
+        vectorizer
+):
+    vectorized_data = vectorizer.fit_transform(df[processed_text_col_name])
+    return train_test_split(
+        vectorized_data,
+        df['sentiment'],
+        test_size=train_df_len,
+        shuffle=False
+    )

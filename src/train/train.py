@@ -1,21 +1,20 @@
 import pandas as pd
-import warnings
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import BernoulliNB
 from sklearn import svm
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-from src.text_preprocessing import (
+from src.data_preprocessing import (
     text_lemmatization,
     text_stemming,
     remove_punctuation_and_stopwords,
     extract_numerical_features,
     tokenize_text,
-    remove_outliers
+    remove_outliers,
+    vectorize_review
 )
 from src.data_loading import (
     download_and_unpack_raw_datasets
@@ -45,21 +44,6 @@ def prepare_train_text(
     return df
 
 
-def vectorize_review(
-        df: pd.DataFrame,
-        processed_text_col_name: str,
-        train_df_len: int,
-        vectorizer
-):
-    vectorized_data = vectorizer.fit_transform(df[processed_text_col_name])
-    return train_test_split(
-        vectorized_data,
-        df['sentiment'],
-        test_size=train_df_len,
-        shuffle=False
-    )
-
-
 def train_model(
         X_train,
         Y_train,
@@ -71,7 +55,6 @@ def train_model(
 
 
 if __name__ == "__main__":
-    warnings.filterwarnings("ignore")
     download_and_unpack_raw_datasets(
         [TRAIN_DATA_URL, TEST_DATA_URL],
         "../../data/raw/"
@@ -88,8 +71,8 @@ if __name__ == "__main__":
         processed_reviews_df.to_csv(f"../../data/processed/processed_{dataset}.csv")
 
     # Reading preprocessed data
-    train_df = pd.read_csv('../data/processed/processed_train.csv')
-    test_df = pd.read_csv('../data/processed/processed_test.csv')
+    train_df = pd.read_csv('../../data/processed/processed_train.csv')
+    test_df = pd.read_csv('../../data/processed/processed_test.csv')
 
     general_df = pd.concat([train_df, test_df], ignore_index=True)
 
