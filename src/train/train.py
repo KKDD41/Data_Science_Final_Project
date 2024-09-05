@@ -1,22 +1,28 @@
 import pandas as pd
-import numpy as np
 import warnings
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import BernoulliNB
-from sklearn import metrics, svm
+from sklearn import svm
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-from preprocessing_utils import (
-    _review_text_lemmatization,
-    _review_text_stemming,
-    _clean_review_text,
-    _extract_numerical_review_info,
-    _tokenize_review_text,
-    _remove_outliers
+from src.text_preprocessing import (
+    text_lemmatization,
+    text_stemming,
+    remove_punctuation_and_stopwords,
+    extract_numerical_features,
+    tokenize_text,
+    remove_outliers
+)
+from src.data_loading import (
+    download_and_unpack_raw_datasets
+)
+from src.config import (
+    TRAIN_DATA_URL,
+    TEST_DATA_URL
 )
 
 
@@ -24,18 +30,18 @@ def prepare_train_dataset(
         df: pd.DataFrame
 ) -> pd.DataFrame:
     df.drop_duplicates(inplace=True)
-    df = _extract_numerical_review_info(df)
-    df = _remove_outliers(df)
+    df = extract_numerical_features(df)
+    df = remove_outliers(df)
     return df
 
 
-def text_preprocessing(
+def prepare_train_text(
         df: pd.DataFrame
 ) -> pd.DataFrame:
-    df = _clean_review_text(df)
-    df = _tokenize_review_text(df)
-    df = _review_text_lemmatization(df)
-    df = _review_text_stemming(df)
+    df = remove_punctuation_and_stopwords(df)
+    df = tokenize_text(df)
+    df = text_lemmatization(df)
+    df = text_stemming(df)
     return df
 
 
@@ -66,6 +72,10 @@ def train_model(
 
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
+    download_and_unpack_raw_datasets(
+        [TRAIN_DATA_URL, TEST_DATA_URL],
+        "../../data/raw/"
+    )
 
     # Data Preprocessing
     for dataset in ('train', 'test'):
@@ -73,7 +83,7 @@ if __name__ == "__main__":
                                  sep=',')
 
         filtered_reviews_df = prepare_train_dataset(reviews_df)
-        processed_reviews_df = text_preprocessing(reviews_df)
+        processed_reviews_df = prepare_train_text(reviews_df)
 
         processed_reviews_df.to_csv(f"../../data/processed/processed_{dataset}.csv")
 

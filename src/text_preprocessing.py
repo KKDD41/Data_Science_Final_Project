@@ -1,12 +1,7 @@
-import numpy as np
 import pandas as pd
 import re
 import nltk
-import spacy
 import string
-from multiprocessing import Pool
-from nltk.corpus import wordnet
-from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from pandarallel import pandarallel
 
@@ -18,7 +13,7 @@ nltk.download('averaged_perceptron_tagger_eng')
 nltk.download('punkt_tab')
 
 
-def _extract_numerical_review_info(
+def extract_numerical_features(
         df: pd.DataFrame
 ) -> pd.DataFrame:
     df['number_of_chars'] = df['review'].apply(len)
@@ -33,7 +28,7 @@ def _extract_numerical_review_info(
     return df
 
 
-def _remove_outliers(
+def remove_outliers(
         df: pd.DataFrame,
         threshold: float = 1.5
 ) -> pd.DataFrame:
@@ -51,7 +46,7 @@ def _remove_outliers(
     return df
 
 
-def _replace_invalid_shortings(text):
+def correct_invalid_shortings(text):
     text = text.lower()
     text = re.sub("isn't", 'is not', text)
     text = re.sub("I've", 'i have', text)
@@ -94,7 +89,7 @@ def _replace_invalid_shortings(text):
     return text
 
 
-def _clean_review_text(
+def remove_punctuation_and_stopwords(
         df: pd.DataFrame
 ) -> pd.DataFrame:
     PUNCT_TO_REMOVE = string.punctuation
@@ -107,12 +102,12 @@ def _clean_review_text(
         .apply(lambda x: re.sub(r'[0-9]+', '', x)) \
         .apply(lambda x: ''.join(filter(lambda y: y in string.printable, x))) \
         .apply(lambda x: " ".join([word for word in x.split() if word not in STOPWORDS])) \
-        .apply(lambda x: _replace_invalid_shortings(x))
+        .apply(lambda x: correct_invalid_shortings(x))
 
     return df
 
 
-def _tokenize_review_text(
+def tokenize_text(
         df: pd.DataFrame
 ) -> pd.DataFrame:
     def tokenize_words(
@@ -127,7 +122,7 @@ def _tokenize_review_text(
     return df
 
 
-def _review_text_lemmatization(
+def text_lemmatization(
         df: pd.DataFrame
 ) -> pd.DataFrame:
     def lemmatize_words(text: list):
@@ -154,7 +149,7 @@ def _review_text_lemmatization(
     return df
 
 
-def _review_text_stemming(
+def text_stemming(
         df: pd.DataFrame
 ) -> pd.DataFrame:
     def stem_words(text: list):

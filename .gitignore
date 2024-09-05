@@ -8,3 +8,4 @@
 *.iml
 *.xml
 /notebooks/.ipynb_checkpoints
+src/config.py
