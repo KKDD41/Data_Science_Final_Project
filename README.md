@@ -522,5 +522,197 @@ The following numerical features of reviews were investigated:
 
 ## Text Preprocessing.
 
+### Actions Preformed.
+
+#### Removal of noise and non-alphabetical characters.
+
+1. Removal of reviews-outliers, which length is not inside IRQ. Total number of outliers is 2958, and number of reviews left for models training 36770.
+2. Removal of HTML-tags (`<br />`).
+3. Removal of punctuation `string.punctuation`.
+4. Removal of `nltk.corpus.stopwords.words('english')`.
+5. Removal of all digits.
+6. Removal of emojis and non-printable characters (all characters left are in `string.printable`).
+
+#### Text tokenization.
+
+Text tokenization was preformed with `nltk.tokenize.word_tokenize`.
+
+#### Lemmatization.
+
+In computational linguistics, lemmatization is the algorithmic process of determining the lemma of a word based on its intended meaning. Unlike stemming, lemmatization depends on correctly identifying the intended part of speech and meaning of a word in a sentence, as well as within the larger context surrounding that sentence, such as neighbouring sentences or even an entire document.
+
+```python
+def lemmatize_words(
+    text: list
+):
+    import nltk
+    from nltk.corpus import wordnet
+    from nltk.stem import WordNetLemmatizer
+
+    nltk.download('wordnet')
+    nltk.download('averaged_perceptron_tagger_eng')
+    
+    lemmatizer = WordNetLemmatizer()
+    wordnet_map = {
+        "N": wordnet.NOUN, 
+        "V": wordnet.VERB, 
+        "J": wordnet.ADJ, 
+        "R": wordnet.ADV
+    }
+    pos_tagged_text = nltk.pos_tag(text)
+    return [lemmatizer.lemmatize(word, wordnet_map.get(pos[0], wordnet.NOUN)) for word, pos in pos_tagged_text]
+
+
+reviews_df['lemmatized_review'] = reviews_df['tokenized_review'].parallel_apply(lemmatize_words)
+```
+
+#### Stemming. 
+
+Stemming is the process of reducing inflected (or sometimes derived) words to their word stem, base or root form—generally a written word form. The stem need not be identical to the morphological root of the word; it is usually sufficient that related words map to the same stem, even if this stem is not in itself a valid root.
+
+```python 
+def stem_words(
+    text
+):
+    from nltk.stem.porter import PorterStemmer
+    stemmer = PorterStemmer()
+    
+    return [stemmer.stem(word) for word in text]
+
+
+reviews_df['stemmed_review'] = reviews_df['tokenized_review'].parallel_apply(stem_words)
+```
+
+#### Lemmatization and Stemming comparison.
+
+- Number of unique words were produced after both approaches.
+```
+Number of unique stemmed words: 93786
+[('movi', 70630),
+ ('film', 59314),
+ ('one', 33908),
+ ('like', 28273),
+ ('good', 19876),
+ ('time', 19668),
+ ('watch', 19329),
+ ('see', 18310),
+ ('make', 18160),
+ ('get', 17379)]
+ 
+Number of unique lemmatized words: 138953
+[('movie', 69502),
+ ('film', 58016),
+ ('one', 30981),
+ ('make', 27532),
+ ('see', 26538),
+ ('like', 26363),
+ ('get', 21789),
+ ('good', 21553),
+ ('time', 19026),
+ ('watch', 17412)]
+```
+
+- Number of short words with length less than 3.
+```
+Number of stemmed words with length less than two: 534
+[(11162, 'go'),
+ (6299, 'im'),
+ (4487, 'us'),
+ (3739, 'tv'),
+ (3235, 'he'),
+ (2411, 'aw'),
+ (1979, 'mr'),
+ (1804, 'ye'),
+ (1794, 'id'),
+ (1746, 'oh'),
+ (1372, 'ok'),
+ (983, 'ad'),
+ (915, 'th'),
+ (857, 'dr'),
+ (813, 'b'),
+ (740, 'la'),
+ (737, 'de'),
+ (537, 'na'),
+ (513, 'of'),
+ (505, 'ed')]
+ 
+Number of lemmatized words with length less than two: 931
+[(16095, 'go'),
+ (5953, 'Im'),
+ (3878, 'do'),
+ (3816, 'u'),
+ (3494, 'TV'),
+ (2174, 'he'),
+ (1671, 'Id'),
+ (1631, 'Mr'),
+ (1200, 'Oh'),
+ (1166, 'OK'),
+ (895, 'th'),
+ (851, 'US'),
+ (824, 'Dr'),
+ (678, 'B'),
+ (522, 'na'),
+ (492, 'oh'),
+ (488, 'OF'),
+ (464, 'Ed'),
+ (427, 'Ms'),
+ (424, 'II')]
+```
+- Due to higher number of distinct words, including shorted words, for models training stemmed reviews will be used.
+
+### Vectorization.
+
+For future models training and evaluation we have prepared two vectorized versions using simple Count Vectorizer and TF-IDF.
+
+```python
+def vectorize_review(
+        df: pd.DataFrame,
+        processed_text_col_name: str,
+        train_df_len: int,
+        vectorizer
+):
+    vectorized_data = vectorizer.fit_transform(df[processed_text_col_name])
+    return train_test_split(
+        vectorized_data,
+        df['sentiment'],
+        test_size=train_df_len,
+        shuffle=False
+    )
+```
+
+#### Count Vectorizer.
+The count vectorizer is a customizable SciKit Learn preprocessor method. It works with any text out of the box, and applies preprocessing, tokenization and stop words removal on its own. These tasks can be customized, for example by providing a different tokenization method or stop word list. (This applies to all other preprocessors as well.) Applying the count vectorizer to raw text creates a matrix in the form of (document_id, tokens) in which the values are the token count.
+```python
+count_vectorizer = CountVectorizer()
+count_X_train, count_X_test, count_y_train, count_y_test = vectorize_review(
+    df=general_df,
+    processed_text_col_name='stemmed_review',
+    train_df_len=len(train_df),
+    vectorizer=count_vectorizer
+)
+```
+
+#### TF-IDF Vectorizer.
+The Term Frequency/Inverse Document Frequency is a well-known metric in information retrieval. It encodes word frequencies in such a way as to put equal weight to common terms that occur in many documents, as well as uncommon terms only present in a few documents. This metric generalizes well over large corpora and improves finding relevant topics.
+```python
+tfidf_vectorizer = TfidfVectorizer()
+tfidf_X_train, tfidf_X_test, tfidf_y_train, tfidf_y_test = vectorize_review(
+    df=general_df,
+    processed_text_col_name='stemmed_review',
+    train_df_len=len(train_df),
+    vectorizer=tfidf_vectorizer
+)
+```
+
+## Models Training.
+
+
+
+
+    
+
+
+
+
 
 
