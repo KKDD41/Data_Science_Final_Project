@@ -19,7 +19,7 @@ from src.data_preprocessing import (
 from src.data_loading import (
     download_and_unpack_raw_datasets
 )
-from src.config import (
+from src.config_loading import (
     TRAIN_DATA_URL,
     TEST_DATA_URL
 )
