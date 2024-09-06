@@ -1,16 +1,16 @@
-ComplementNB model accuracy is 85.69%
+ComplementNB model accuracy is 86.99%
 ------------------------------------------------
 Confusion Matrix:
        0      1
-0  15694   2748
-1   2513  15815
+0  15806   2636
+1   2149  16179
 ------------------------------------------------
 Classification Report:
               precision    recall  f1-score   support
 
-    negative       0.86      0.85      0.86     18442
-    positive       0.85      0.86      0.86     18328
+    negative       0.88      0.86      0.87     18442
+    positive       0.86      0.88      0.87     18328
 
-    accuracy                           0.86     36770
-   macro avg       0.86      0.86      0.86     36770
-weighted avg       0.86      0.86      0.86     36770
+    accuracy                           0.87     36770
+   macro avg       0.87      0.87      0.87     36770
+weighted avg       0.87      0.87      0.87     36770
