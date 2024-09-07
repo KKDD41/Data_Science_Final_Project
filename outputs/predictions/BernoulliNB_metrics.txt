@@ -1,4 +1,4 @@
-ComplementNB model accuracy is 85.13%
+BernoulliNB model accuracy is 85.13%
 ------------------------------------------------
 Confusion Matrix:
        0      1

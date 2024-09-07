@@ -706,6 +706,146 @@ tfidf_X_train, tfidf_X_test, tfidf_y_train, tfidf_y_test = vectorize_review(
 
 ## Models Training.
 
+There were three models chosen appropriate for binary sentiment analysis: SVM with linear kernel, Logistic Regression and Bernoulli Naive Bayes. All of them were trained and evaluated for best approach choosing.
+Main function for models training:
+```python
+def train_model(
+        X_train,
+        Y_train,
+        classifier
+):
+    classifier.fit(X_train, Y_train)
+    joblib.dump(classifier, f'{MODELS_DIR}{classifier.__class__.__name__}.pkl')
+    return classifier
+```
+
+
+### Bernoulli Naive Bayes.
+Bernoulli Naive Bayes is a variant of Naive Bayes that is particularly suited for binary/boolean features. The model is based on the Bayes Theorem and assumes that all features are independent given the class. In text classification, this model is typically used with binary feature vectors (rather than counts or TF-IDF features) which indicate the presence or absence of a word. For sentiment analysis, each word in the vocabulary is treated as a feature and it contributes independently to the probability that the sentiment is positive or negative.
+
+*Advantages*:
+- **Handling of Binary Data**: It works well with binary feature models which are common in text processing where presence or absence of words is a useful feature.
+- **Scalability and Speed**: The independence assumption simplifies computation, making this model very efficient and scalable to large datasets.
+- **Performance**: Despite its simplicity and the strong independence assumption, Bernoulli Naive Bayes can perform surprisingly well on sentiment analysis tasks, especially when the dataset is large.
+```python
+BNB = BernoulliNB()
+bernoulli_nb = train_model(
+    count_X_train,
+    count_y_train,
+    BNB
+)
+```
+
+### SVM.
+Support Vector Machine (SVM) is a powerful and versatile supervised machine learning algorithm used for classification and regression tasks. In the context of text sentiment analysis, SVM with a linear kernel is particularly useful. The linear kernel is a dot product between two instances, and it offers a straightforward linear decision boundary. The main idea behind SVM is to find the optimal hyperplane that maximally separates the classes in the feature space. For binary classification, such as positive/negative sentiment analysis, SVM focuses on constructing the hyperplane that has the largest distance to the nearest training data points of any class, which are called support vectors. This margin maximization offers robustness, especially in high-dimensional spaces.
+
+*Advantages*:
+
+- **Effectiveness in High-Dimensional Spaces**: SVMs are particularly effective in high-dimensional spaces, which is typical in text data due to the large vocabulary size.
+- **Robustness**: The margin maximization principle helps SVMs to be robust against overfitting, especially in linearly separable cases.
+- **Scalability**: With linear kernels, SVMs can scale relatively well to large text datasets.
+```python
+scaler = StandardScaler(with_mean=False)
+scaler.fit(count_X_train)
+
+norm_count_X_train = scaler.transform(count_X_train)
+norm_count_X_test = scaler.transform(count_X_test)
+norm_count_y_train = count_y_train.apply(lambda x: 1 if x == 'positive' else 0)
+norm_count_y_test = count_y_test.apply(lambda x: 1 if x == 'positive' else 0)
+
+SVM = svm.SVC(kernel='linear')
+SVM = train_model(
+    norm_count_X_train,
+    norm_count_y_train,
+    SVM
+)
+```
+
+### Logistic Regression.
+Logistic Regression is a statistical model that in its basic form uses a logistic function to model a binary dependent variable. In the context of sentiment analysis, the probabilities describing the possible outcomes of a single trial are modeled as a function of the predictor variables (text features). Logistic regression measures the relationship between the categorical dependent variable and one or more independent variables by estimating probabilities using a logistic function, which is an S-shaped curve that can take any real-valued number and map it into a value between 0 and 1, but never exactly at those limits.
+
+*Advantages*:
+
+- **Interpretability**: Unlike more complex models, logistic regression models have the advantage of being interpretable. Each feature’s weights indicate the importance and influence on the sentiment classification.
+- **Efficiency**: Logistic regression is less computationally intensive than more complex algorithms, making it a relatively fast model to train.
+- **Probabilistic** Interpretation: The model outputs a probability for the sentiment class, which can be a useful measure of confidence in the classification.
+```python
+LG = LogisticRegression()
+logistic_regression = train_model(
+    tfidf_X_train,
+    tfidf_y_train,
+    LG
+)
+```
+
+
+## Models Evaluation.
+
+Metrics were considered for models evaluation:
+- `sklearn.metrics.accuracy_score`.
+- `sklear.metrics.confusion_matrix`.
+- Weighted average for precision, recall, f1-score and support (using `sklearn.metrics.classification_report`).
+- Time required for model's training and evaluation.
+
+### Bernoulli Naive Bayes.
+
+- Accuracy score is: **85.13%**.
+- CPU times: total: **1.53 s**.
+- Wall time: **2.6 s**.
+- Confusion matrix:
+
+![png](outputs/figures/nb_cm.png)
+- Classification report:
+```csv
+              precision    recall  f1-score   support
+
+    negative       0.84      0.87      0.85     18442
+    positive       0.86      0.83      0.85     18328
+
+    accuracy                           0.85     36770
+   macro avg       0.85      0.85      0.85     36770
+weighted avg       0.85      0.85      0.85     36770
+```
+### SVM.
+
+- Accuracy score is: **81.95%**.
+- CPU times: total: **3min 17s**.
+- Wall time: **4min 1s**.
+- Confusion matrix:
+
+![png](outputs/figures/svm_cm.png)
+- Classification report:
+```csv
+              precision    recall  f1-score   support
+
+           0       0.83      0.81      0.82     18442
+           1       0.81      0.83      0.82     18328
+
+    accuracy                           0.82     36770
+   macro avg       0.82      0.82      0.82     36770
+weighted avg       0.82      0.82      0.82     36770
+```
+
+
+### Logistic Regression.
+
+- Accuracy score is: **85.69%**.
+- CPU times: total: **2.12 s**.
+- Wall time: **2.65 s**.
+- Confusion matrix:
+
+![png](outputs/figures/lg_cm.png)
+- Classification report:
+```csv
+              precision    recall  f1-score   support
+
+    negative       0.88      0.86      0.87     18442
+    positive       0.86      0.88      0.87     18328
+
+    accuracy                           0.87     36770
+   macro avg       0.87      0.87      0.87     36770
+weighted avg       0.87      0.87      0.87     36770
+```
 
 
 

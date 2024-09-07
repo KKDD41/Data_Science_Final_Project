@@ -1,4 +1,4 @@
-ComplementNB model accuracy is 86.99%
+LogisticRegression model accuracy is 86.99%
 ------------------------------------------------
 Confusion Matrix:
        0      1

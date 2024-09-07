@@ -32,7 +32,7 @@ def test_model(
     classification_report = metrics.classification_report(Y_test, predicted)
 
     models_evaluation_metrics = ""
-    models_evaluation_metrics += f'ComplementNB model accuracy is {round(accuracy_score * 100, 2)}%'
+    models_evaluation_metrics += f'{classifier.__class__.__name__} model accuracy is {round(accuracy_score * 100, 2)}%'
     models_evaluation_metrics += '\n------------------------------------------------\n'
     models_evaluation_metrics += 'Confusion Matrix:\n'
     models_evaluation_metrics += str(pd.DataFrame(cf_matrix))
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     norm_count_X_test = scaler.transform(count_X_test)
     norm_count_y_test = count_y_test.apply(lambda x: 1 if x == 'positive' else 0)
 
-    svm_results = test_model(
+    svm_res = test_model(
         norm_count_X_test,
         norm_count_y_test,
         SVM
