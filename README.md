@@ -1,5 +1,7 @@
 # Data Science Final Project.
 
+## Table of Contents.
+
 ## Task Overview.
 
 ### Assignment.
@@ -11,6 +13,18 @@ Initial data analysis and experiments were done in the notebooks (`./notebooks/`
 - `EDA.ipynb`
 - `data_preprocessing.ipynb`
 - `models_training_and_evaluation.ipynb`
+
+`./src` folder contains two main folders for building and executing Docker containers for models training (`./src/train/train.py`) and evaluation (`./src/inference/run_interference.py`).
+Following supporting scripts are created:
+- `config_loading.py`: loads necessary sources for initial datasets and defines directories for future models, predictions, and metrics storage from `sources.cfg`.
+- `data_loading.py`: loads and unpacks raw data.
+- `data_preprocessing.py`: set of util functions used for text preprocessing (including features creation, tokenization, lemmatization & stemming, vectorization, etc.)
+
+In `./outputs/predictions/` folder for each of three considered models metrics and predicted datasets are stored.
+
+### Pipeline Execution.
+
+TOTO
 
 ## Exploratory Data Analysis.
 
@@ -768,7 +782,7 @@ Logistic Regression is a statistical model that in its basic form uses a logisti
 
 - **Interpretability**: Unlike more complex models, logistic regression models have the advantage of being interpretable. Each feature’s weights indicate the importance and influence on the sentiment classification.
 - **Efficiency**: Logistic regression is less computationally intensive than more complex algorithms, making it a relatively fast model to train.
-- **Probabilistic** Interpretation: The model outputs a probability for the sentiment class, which can be a useful measure of confidence in the classification.
+- **Probabilistic Interpretation**: The model outputs a probability for the sentiment class, which can be a useful measure of confidence in the classification.
 ```python
 LG = LogisticRegression()
 logistic_regression = train_model(
@@ -790,7 +804,7 @@ Metrics were considered for models evaluation:
 ### Bernoulli Naive Bayes.
 
 - Accuracy score is: **85.13%**.
-- CPU times: total: **1.53 s**.
+- CPU times: **1.53 s**.
 - Wall time: **2.6 s**.
 - Confusion matrix:
 
@@ -809,7 +823,7 @@ weighted avg       0.85      0.85      0.85     36770
 ### SVM.
 
 - Accuracy score is: **81.95%**.
-- CPU times: total: **3min 17s**.
+- CPU times: **3min 17s**.
 - Wall time: **4min 1s**.
 - Confusion matrix:
 
@@ -830,7 +844,7 @@ weighted avg       0.82      0.82      0.82     36770
 ### Logistic Regression.
 
 - Accuracy score is: **85.69%**.
-- CPU times: total: **2.12 s**.
+- CPU times: **2.12 s**.
 - Wall time: **2.65 s**.
 - Confusion matrix:
 
@@ -847,10 +861,22 @@ weighted avg       0.82      0.82      0.82     36770
 weighted avg       0.87      0.87      0.87     36770
 ```
 
+## Conclusion.
 
+### Performance Evaluation.
 
-    
+Among all evaluated models, the worst overall performance was for SVM with linear kernel. Both training and testing time was ~90 times more than for other models (additional time 
+for standardization was not included).
+Given accuracy is 81.95%, while Naive Bayes and Logistic Regression performance were above 85%. From two other models as a working one Logistic Regression was selected due to the following considerations:
+- **Clarity in Decision-Making**: Logistic Regression provides coefficients for each feature (word or phrase in this context), indicating the strength and direction of their impact on the sentiment. This interpretability is crucial for understanding which aspects of the reviews most influence the sentiment, allowing for more informed decision-making and adjustments in strategy.
+- **Threshold Adjustment**: The output of Logistic Regression is a probability, providing a nuanced view of sentiment beyond simple binary classifications. This allows for threshold tuning based on business needs, such as prioritizing precision over recall (or vice versa).
+- **Quick Deployment**: Logistic Regression is generally less computationally intensive than models like SVM with non-linear kernels or deep learning models. This efficiency facilitates quicker retraining cycles and easier deployment, which is beneficial in dynamic environments where models need frequent updates.
 
+### Business Applications.
+
+Chosen Logistic Regression model for binary sentiment analysis of movie reviews could be used and adjusted for the following business purposes:
+- **Audience Sentiment Tracking**: Understand public sentiment toward movie releases, promotional campaigns, or other media content. This can guide marketing strategies and content adjustments.
+- **Recommendation Systems**: Enhance user experience on streaming platforms by recommending movies based on the sentiment of reviews they find aligning with their preferences.
 
 
 
