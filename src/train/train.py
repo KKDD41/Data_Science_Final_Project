@@ -21,7 +21,10 @@ from src.data_loading import (
 )
 from src.config_loading import (
     TRAIN_DATA_URL,
-    TEST_DATA_URL
+    TEST_DATA_URL,
+    RAW_DATA_DIR,
+    PROCESSED_DATA_DIR,
+    MODELS_DIR
 )
 
 
@@ -50,29 +53,29 @@ def train_model(
         classifier
 ):
     classifier.fit(X_train, Y_train)
-    joblib.dump(classifier, f'../../outputs/models/{classifier.__class__.__name__}.pkl')
+    joblib.dump(classifier, f'{MODELS_DIR}{classifier.__class__.__name__}.pkl')
     return classifier
 
 
 if __name__ == "__main__":
     download_and_unpack_raw_datasets(
         [TRAIN_DATA_URL, TEST_DATA_URL],
-        "../../data/raw/"
+        RAW_DATA_DIR
     )
 
     # Data Preprocessing
     for dataset in ('train', 'test'):
-        reviews_df = pd.read_csv(f"../../data/raw/final_project_{dataset}_dataset/{dataset}.csv",
+        reviews_df = pd.read_csv(f"{RAW_DATA_DIR}/{dataset}.csv",
                                  sep=',')
 
         filtered_reviews_df = prepare_train_dataset(reviews_df)
         processed_reviews_df = prepare_train_text(reviews_df)
 
-        processed_reviews_df.to_csv(f"../../data/processed/processed_{dataset}.csv")
+        processed_reviews_df.to_csv(f"{PROCESSED_DATA_DIR}{dataset}.csv")
 
     # Reading preprocessed data
-    train_df = pd.read_csv('../../data/processed/processed_train.csv')
-    test_df = pd.read_csv('../../data/processed/processed_test.csv')
+    train_df = pd.read_csv(f"{PROCESSED_DATA_DIR}train.csv")
+    test_df = pd.read_csv(f"{PROCESSED_DATA_DIR}test.csv")
 
     general_df = pd.concat([train_df, test_df], ignore_index=True)
 

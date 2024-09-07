@@ -8,6 +8,11 @@ import joblib
 from src.data_preprocessing import (
     vectorize_review
 )
+from src.config_loading import (
+    PROCESSED_DATA_DIR,
+    MODELS_DIR,
+    PREDICTIONS_DIR
+)
 
 
 def load_model(
@@ -35,28 +40,26 @@ def test_model(
     models_evaluation_metrics += 'Classification Report:\n'
     models_evaluation_metrics += str(classification_report)
 
-    print(models_evaluation_metrics)
-
-    with open(f"../../outputs/predictions/{classifier.__class__.__name__}_metrics.txt", 'w') as f:
+    with open(f"{PREDICTIONS_DIR}{classifier.__class__.__name__}_metrics.txt", 'w') as f:
         f.write(models_evaluation_metrics)
 
     predicted_df = test_df
     predicted_df['predicted_sentiment'] = pd.Series(predicted)
-    predicted_df.to_csv(f"../../outputs/predictions/{classifier.__class__.__name__}_predictions.csv")
+    predicted_df.to_csv(f"{PREDICTIONS_DIR}{classifier.__class__.__name__}_predictions.csv")
 
     return accuracy_score, cf_matrix, classification_report
 
 
 if __name__ == "__main__":
     # Data & Models loading
-    train_df = pd.read_csv('../../data/processed/processed_train.csv')
-    test_df = pd.read_csv('../../data/processed/processed_test.csv')
+    train_df = pd.read_csv(f'{PROCESSED_DATA_DIR}train.csv')
+    test_df = pd.read_csv(f'{PROCESSED_DATA_DIR}test.csv')
 
     general_df = pd.concat([train_df, test_df], ignore_index=True)
 
-    bernoulli_nb = load_model("../../outputs/models/BernoulliNB.pkl")
-    SVM = load_model("../../outputs/models/SVC.pkl")
-    logistic_regression = load_model("../../outputs/models/LogisticRegression.pkl")
+    bernoulli_nb = load_model(f"{MODELS_DIR}BernoulliNB.pkl")
+    SVM = load_model(f"{MODELS_DIR}SVC.pkl")
+    logistic_regression = load_model(f"{MODELS_DIR}LogisticRegression.pkl")
 
     # Vectorization
     count_vectorizer = CountVectorizer()
