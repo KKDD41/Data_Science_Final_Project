@@ -1,14 +1,11 @@
 # Data Science Final Project.
 
-## Table of Contents.
-
 ## Task Overview.
 
 ### Assignment.
 Build a model for binary (positive / negative) sentiment analysis of movies text reviews. Two datasets `train.csv` and `test.csv` were given for model's training and evaluation respectively.
 
 ### Code overview.
-
 Initial data analysis and experiments were done in the notebooks (`./notebooks/` folder):
 - `EDA.ipynb`
 - `data_preprocessing.ipynb`
@@ -21,8 +18,24 @@ Supporting `utils` package with listed scripts was created:
 - `data_preprocessing.py`: set of util functions used for text preprocessing (including features creation, tokenization, lemmatization & stemming, vectorization, etc.)
 
 In `./outputs/predictions/` folder for each of three considered models metrics and predicted datasets are stored. Pickled models are stored in `./outputs/models/` directory.
+Both `./data` and `./outputs` directories will be used as volumes for train and test Docker containers. 
 
 ### Pipeline Execution.
+
+For convenient directories definition `sources.cfg` file must be created with the following structure (links must be filled, default directories names could be left as is):
+```editorconfig
+[urls]
+TRAIN_DATA_URL = # Link for downloading final_project_train_dataset.zip 
+TEST_DATA_URL = # Link for downloading final_project_test_dataset.zip
+
+[dirs]
+# Default directories in which corresponding data will be stored
+PROCESSED_DATA_DIR = /usr/dsapp/data/processed/  
+RAW_DATA_DIR = /usr/dsapp/data/raw/
+
+MODELS_DIR = /usr/dsapp/outputs/models/
+PREDICTIONS_DIR = /usr/dsapp/outputs/predictions/
+```
 
 Execution of container responsible for loading data, models training and storing the following command should be executed:
 ```commandline

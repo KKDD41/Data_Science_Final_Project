@@ -1,11 +1,11 @@
 .gitignore
 .venv
 *pycache*
-/data
-/outputs/models
+/data/raw/*.csv
+/data/processed/*.csv
+/outputs/models/*.pkl
 /External
 .idea
 *.iml
 *.xml
 /notebooks/.ipynb_checkpoints
-sources.cfg
