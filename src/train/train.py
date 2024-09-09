@@ -7,7 +7,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-from src.data_preprocessing import (
+from utils.data_preprocessing import (
     text_lemmatization,
     text_stemming,
     remove_punctuation_and_stopwords,
@@ -16,10 +16,10 @@ from src.data_preprocessing import (
     remove_outliers,
     vectorize_review
 )
-from src.data_loading import (
+from utils.data_loading import (
     download_and_unpack_raw_datasets
 )
-from src.config_loading import (
+from utils.config_loading import (
     TRAIN_DATA_URL,
     TEST_DATA_URL,
     RAW_DATA_DIR,
@@ -108,9 +108,7 @@ if __name__ == "__main__":
     scaler.fit(count_X_train)
 
     norm_count_X_train = scaler.transform(count_X_train)
-    norm_count_X_test = scaler.transform(count_X_test)
     norm_count_y_train = count_y_train.apply(lambda x: 1 if x == 'positive' else 0)
-    norm_count_y_test = count_y_test.apply(lambda x: 1 if x == 'positive' else 0)
 
     SVM = svm.SVC(kernel='linear')
     SVM = train_model(
@@ -125,3 +123,4 @@ if __name__ == "__main__":
         tfidf_y_train,
         LG
     )
+

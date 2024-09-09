@@ -24,7 +24,17 @@ In `./outputs/predictions/` folder for each of three considered models metrics a
 
 ### Pipeline Execution.
 
-TOTO
+Execution of container responsible for loading data, models training and storing the following command should be executed:
+```commandline
+docker build -t models-train-image -f ./src/train/Dockerfile . 
+docker run --volume=$pwd\data\raw:/usr/dsapp/data/raw  \
+           --volume=$pwd\data\processed:/usr/dsapp/data/processed \
+           --volume=$pwd\outputs\models:/usr/dsapp/outputs/models \
+           --network=bridge \
+           --workdir=/usr/dsapp \
+           --restart=no \
+           --runtime=runc -d models-train-image
+```
 
 ## Exploratory Data Analysis.
 

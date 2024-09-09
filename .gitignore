@@ -8,5 +8,5 @@
 *.iml
 *.xml
 /notebooks/.ipynb_checkpoints
-/src/config_loading.py
+/utils/config_loading.py
 sources.cfg
