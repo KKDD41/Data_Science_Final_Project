@@ -5,10 +5,10 @@ from sklearn import metrics
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-from utils import (
+from utils.data_preprocessing import (
     vectorize_review
 )
-from utils import (
+from utils.config_loading import (
     PROCESSED_DATA_DIR,
     MODELS_DIR,
     PREDICTIONS_DIR

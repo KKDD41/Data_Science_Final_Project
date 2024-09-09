@@ -1,6 +1,6 @@
 .gitignore
 .venv
-.pycache
+*pycache*
 /data
 /outputs/models
 /External
@@ -8,5 +8,4 @@
 *.iml
 *.xml
 /notebooks/.ipynb_checkpoints
-/utils/config_loading.py
 sources.cfg

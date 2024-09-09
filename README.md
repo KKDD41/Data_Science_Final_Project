@@ -15,12 +15,12 @@ Initial data analysis and experiments were done in the notebooks (`./notebooks/`
 - `models_training_and_evaluation.ipynb`
 
 `./src` folder contains two main folders for building and executing Docker containers for models training (`./src/train/train.py`) and evaluation (`./src/inference/run_interference.py`).
-Following supporting scripts are created:
+Supporting `utils` package with listed scripts was created:
 - `config_loading.py`: loads necessary sources for initial datasets and defines directories for future models, predictions, and metrics storage from `sources.cfg`.
 - `data_loading.py`: loads and unpacks raw data.
 - `data_preprocessing.py`: set of util functions used for text preprocessing (including features creation, tokenization, lemmatization & stemming, vectorization, etc.)
 
-In `./outputs/predictions/` folder for each of three considered models metrics and predicted datasets are stored.
+In `./outputs/predictions/` folder for each of three considered models metrics and predicted datasets are stored. Pickled models are stored in `./outputs/models/` directory.
 
 ### Pipeline Execution.
 
@@ -31,9 +31,17 @@ docker run --volume=$pwd\data\raw:/usr/dsapp/data/raw  \
            --volume=$pwd\data\processed:/usr/dsapp/data/processed \
            --volume=$pwd\outputs\models:/usr/dsapp/outputs/models \
            --network=bridge \
-           --workdir=/usr/dsapp \
-           --restart=no \
            --runtime=runc -d models-train-image
+```
+
+For models evaluation the following commands will create and run required container:
+```commandline
+docker build -t models-test-image -f ./src/inference/Dockerfile . 
+docker run --volume=$pwd\outputs\predictions:/usr/dsapp/outputs/predictions  \
+           --volume=$pwd\outputs\models:/usr/dsapp/outputs/models \
+           --volume=$pwd\data\processed:/usr/dsapp/data/processed \
+           --network=bridge \
+           --runtime=runc -d models-test-image
 ```
 
 ## Exploratory Data Analysis.
